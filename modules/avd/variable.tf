@@ -1,0 +1,40 @@
+variable "rg_workspace" {
+  type = string
+}
+
+variable "location" {
+  type = string
+}
+
+variable "hostpool_name" {
+  type = string
+}
+
+variable "tags" {
+  type = map(any)
+}
+
+variable "vm_names" {
+  type = any
+}
+
+variable "applicationgroup_name" {
+  type = string
+}
+
+variable "vm_ids" {
+  type = map(any)
+}
+
+variable "key_vault_name" {
+  type = string
+}
+
+variable "key_vault_rg" {
+  type = string
+}
+
+variable "registrationToken" {
+  default = "eyJhbGciOiJSUzI1NiIsImtpZCI6IjQ4NEJBMzVERTg5RjQxODlEQUQ4RDREMUFBRDg3MzBCRkZCNzg2QzAiLCJ0eXAiOiJKV1QifQ.eyJSZWdpc3RyYXRpb25JZCI6IjI4MTNhYzNiLTJkM2UtNGVkOS05ZGU3LWZmYWM3MWQyODk0YyIsIkJyb2tlclVyaSI6Imh0dHBzOi8vcmRicm9rZXItZy1nYi1yMC53dmQubWljcm9zb2Z0LmNvbS8iLCJEaWFnbm9zdGljc1VyaSI6Imh0dHBzOi8vcmRkaWFnbm9zdGljcy1nLWdiLXIwLnd2ZC5taWNyb3NvZnQuY29tLyIsIkVuZHBvaW50UG9vbElkIjoiMzJjMzMyNDYtZjliNC00MDBlLWJkZmItMTcyMDY4Y2U1NGMyIiwiR2xvYmFsQnJva2VyVXJpIjoiaHR0cHM6Ly9yZGJyb2tlci53dmQubWljcm9zb2Z0LmNvbS8iLCJHZW9ncmFwaHkiOiJHQiIsIkdsb2JhbEJyb2tlclJlc291cmNlSWRVcmkiOiJodHRwczovLzMyYzMzMjQ2LWY5YjQtNDAwZS1iZGZiLTE3MjA2OGNlNTRjMi5yZGJyb2tlci53dmQubWljcm9zb2Z0LmNvbS8iLCJCcm9rZXJSZXNvdXJjZUlkVXJpIjoiaHR0cHM6Ly8zMmMzMzI0Ni1mOWI0LTQwMGUtYmRmYi0xNzIwNjhjZTU0YzIucmRicm9rZXItZy1nYi1yMC53dmQubWljcm9zb2Z0LmNvbS8iLCJEaWFnbm9zdGljc1Jlc291cmNlSWRVcmkiOiJodHRwczovLzMyYzMzMjQ2LWY5YjQtNDAwZS1iZGZiLTE3MjA2OGNlNTRjMi5yZGRpYWdub3N0aWNzLWctZ2ItcjAud3ZkLm1pY3Jvc29mdC5jb20vIiwiQUFEVGVuYW50SWQiOiI1M2EwNjUxNy1iYWNhLTQ3NTYtOWI0YS04OGVlOTAzYzU4ZWYiLCJuYmYiOjE2Njc1NTQ5MzEsImV4cCI6MTY2OTc2NjQwMCwiaXNzIjoiUkRJbmZyYVRva2VuTWFuYWdlciIsImF1ZCI6IlJEbWkifQ.B6PGq2924diAVh6Y7umFpxMzx1Luu6gRwjq4tkCAv90eQC3IISzhmSUvNYkviS2s5aII07TS0dZ3xib0YPaRWNc8AzLBZtBpIAz36yzSpfQr7tLimLdT6Rx9o1VJpbTStA380lbsvZ4PbI4o5cCe1WsVZ5JHfCFvMgDzttmRtI1K-qAnHT2SiESNknvggpciVbDkYe4g5MaFGngAiU5g2-F5aTTegjJ9OdvGYUHx9MoHpuJafX7JgHX6ZXA1Y1ZuKZgt-UQ9zzQPEG9CKkIeLTH6nNmpMZjji6NmnFx5ObuXGLc4gPOBs-H0DBE72hNUgOiW-igzSY3E0Z66CvE9AQ"
+  type    = string
+}

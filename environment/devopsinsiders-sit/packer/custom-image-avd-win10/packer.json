@@ -1,0 +1,55 @@
+{
+    "variables": {
+        "ADOServicePrincipalAppId": "",
+        "ADOServicePrincipalSecret": "",
+        "TenantId": "",
+        "SubscriptionId": "",
+        "managed_image_rg": "",
+        "managed_image_name": "",
+        "image_publisher": "",
+        "image_offer": "",
+        "image_sku" : ""
+    },
+    "builders": [
+        {
+            "type": "azure-arm",
+
+            "client_id": "{{user `ADOServicePrincipalAppId`}}",
+            "client_secret": "{{user `ADOServicePrincipalSecret`}}",
+            "tenant_id": "{{user `TenantId`}}",
+            "subscription_id": "{{user `SubscriptionId`}}",
+
+            "managed_image_resource_group_name": "{{user `managed_image_rg`}}",
+            "managed_image_name": "{{user `managed_image_name`}}",
+
+            "os_type": "Windows",
+            "image_publisher": "{{user `image_publisher`}}",
+            "image_offer": "{{user `image_offer`}}",
+            "image_sku": "{{user `image_sku`}}",
+
+            "communicator": "winrm",
+            "winrm_use_ssl": true,
+            "winrm_insecure": true,
+            "winrm_timeout": "5m",
+            "winrm_username": "packer",
+            "azure_tags": {
+                "CREATED BY": "PACKER",
+                "Image Publisher": "{{user `image_publisher`}}",
+                "Image Offer": "{{user `image_offer`}}",
+                "Image SKU": "{{user `image_sku`}}"
+            },
+            "build_resource_group_name": "rg-devopsinsiders-avd-workspace",
+            "vm_size": "Standard_D2s_v3"
+        }
+    ],
+    "provisioners": [
+        {
+            "type": "powershell",
+            "script": "environment/devopsinsiders-sit/packer/custom-image-avd-win10/install-apps.ps1"
+        },
+        {
+            "type": "powershell",
+            "script": "environment/devopsinsiders-sit/packer/custom-image-avd-win10/sys-prep.ps1"
+        }
+    ]
+}

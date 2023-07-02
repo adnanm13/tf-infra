@@ -1,0 +1,123 @@
+trigger:
+  paths:
+    include:
+    - environment/devopsinsiders-sit/avd
+ 
+pool:
+  vmImage: ubuntu-latest
+ 
+stages :
+  - stage: TerraformValidate
+    displayName: Terraform Validate
+    jobs:
+    - job: validate
+      continueOnError: false
+      steps:
+      - task: TerraformInstaller@0
+        displayName: 'Install'
+        inputs:
+          terraformVersion: '1.2.7'
+      - task: TerraformTaskV3@3
+        inputs:
+          provider: 'azurerm'
+          command: 'init'
+          workingDirectory: '$(System.DefaultWorkingDirectory)/environment/devopsinsiders-sit/avd'
+          backendServiceArm: 'devopsinsiders Subscription(991bfc33-15gt-76ju-254w-72e8b498506a)'
+          backendAzureRmResourceGroupName: 'rg-devopsinsiders-storage-accounts'
+          backendAzureRmStorageAccountName: 'devopsinsiders'
+          backendAzureRmContainerName: 'terraform'
+          backendAzureRmKey: 'devopsinsiders-avd/terraform.tfstate'
+      - task: TerraformTaskV3@3
+        displayName: 'Validate'
+        inputs:
+          provider: 'azurerm'
+          command: 'validate'
+          workingDirectory: '$(System.DefaultWorkingDirectory)/environment/devopsinsiders-sit/avd'
+      
+  - stage: QualityCheckStage
+    dependsOn: [TerraformValidate]
+    displayName: TFSec Quality Check Stage
+    jobs:
+      - job: TFSecJob
+        displayName: Run TFSec Scan
+        steps:
+        - task: tfsec@1
+          displayName: 'Tfsec Scan'
+          inputs:
+            debug: true
+            version: 'v1.26.0'
+            args: '--soft-fail'
+            dir: '$(System.DefaultWorkingDirectory)/environment/devopsinsiders-sit/avd'
+           
+  - stage: TerraformPlan
+    displayName: Terraform Plan
+    dependsOn: [QualityCheckStage]
+    condition: succeeded('TerraformValidate')
+    jobs:
+      - job: terraform_plan_develop
+        steps:
+              - checkout: self
+              - task: TerraformInstaller@0
+                displayName: 'install'
+                inputs:
+                  terraformVersion: '1.2.7'
+              - task: TerraformTaskV3@3
+                displayName: Plan
+                inputs:
+                  provider: 'azurerm'
+                  command: 'init'
+                  workingDirectory: '$(System.DefaultWorkingDirectory)/environment/devopsinsiders-sit/avd'
+                  backendServiceArm: 'devopsinsiders Subscription(991bfc33-15gt-76ju-254w-72e8b498506a)'
+                  backendAzureRmResourceGroupName: 'rg-devopsinsiders-storage-accounts'
+                  backendAzureRmStorageAccountName: 'devopsinsiders'
+                  backendAzureRmContainerName: 'terraform'
+                  backendAzureRmKey: 'devopsinsiders-avd/terraform.tfstate'
+              - task: TerraformTaskV3@3
+                inputs:
+                  provider: 'azurerm'
+                  command: 'plan'
+                  workingDirectory: '$(System.DefaultWorkingDirectory)/environment/devopsinsiders-sit/avd'
+                  environmentServiceNameAzureRM: 'devopsinsiders Subscription(991bfc33-15gt-76ju-254w-72e8b498506a)'
+ 
+  - stage: TerraformApply
+    displayName: Terraform Apply
+    dependsOn: [TerraformValidate,TerraformPlan]
+    condition: and(contains(variables['build.sourceBranch'], 'refs/heads/main'), succeeded())
+    jobs:
+      - job: waitForValidation
+        displayName: Wait for external validation
+        pool: server
+        timeoutInMinutes: 60 # job times out in 3 days
+        steps:
+        - task: ManualValidation@0
+          timeoutInMinutes: 60 # task times out in 1 day
+          inputs:
+            notifyUsers: |
+              example@example.com
+            instructions: 'Please validate the Terraform Plan and resume'
+            onTimeout: 'reject'
+
+      - job: terraform_apply
+        dependsOn: waitForValidation
+        steps:
+              - checkout: self
+              - task: TerraformInstaller@0
+                displayName: 'install'
+                inputs:
+                  terraformVersion: '1.2.7'
+              - task: TerraformTaskV3@3
+                inputs:
+                  provider: 'azurerm'
+                  command: 'init'
+                  workingDirectory: '$(System.DefaultWorkingDirectory)/environment/devopsinsiders-sit/avd'
+                  backendServiceArm: 'devopsinsiders Subscription(991bfc33-15gt-76ju-254w-72e8b498506a)'
+                  backendAzureRmResourceGroupName: 'rg-devopsinsiders-storage-accounts'
+                  backendAzureRmStorageAccountName: 'devopsinsiders'
+                  backendAzureRmContainerName: 'terraform'
+                  backendAzureRmKey: 'devopsinsiders-avd/terraform.tfstate'
+              - task: TerraformTaskV3@3
+                inputs:
+                  provider: 'azurerm'
+                  command: 'apply'
+                  workingDirectory: '$(System.DefaultWorkingDirectory)/environment/devopsinsiders-sit/avd'
+                  environmentServiceNameAzureRM: 'devopsinsiders Subscription(991bfc33-15gt-76ju-254w-72e8b498506a)'

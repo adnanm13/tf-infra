@@ -1,0 +1,47 @@
+trigger: none
+ 
+pool:
+  vmImage: ubuntu-latest
+
+parameters:
+- name: image_publisher
+  displayName: Base Image Publisher
+  type: string
+  default: microsoftwindowsdesktop
+- name: image_offer
+  displayName: Base Image Offer
+  type: string
+  default: windows-10
+- name: image_sku
+  displayName: Base Image SKU
+  type: string
+  default: win10-21h2-ent-g2
+- name: managed_image_rg
+  displayName: Managed Image Resource Group
+  type: string
+  default: rg-devopsinsiders-avd-workspace
+  values:
+  - rg-devopsinsiders-avd-workspace
+  - rg-devopsinsiders-applications
+- name: managed_image_name
+  displayName: Managed Image Name
+  type: string
+  default: devopsinsiders-avd-packer-custom-image-win10-v2.0.1
+
+steps:
+- task: PackerBuild@1
+  inputs:
+    templateType: 'custom'
+    customTemplateLocation: 'environment/devopsinsiders-sit/packer/custom-image-avd-win10/packer.json'
+    customTemplateParameters: |
+      {
+        "ADOServicePrincipalAppId": "$(client_id)",
+        "ADOServicePrincipalSecret": "$(client_secret)",
+        "TenantId": "$(tenant_id)",
+        "SubscriptionId": "$(subscription_id)",
+        "managed_image_rg": "${{ parameters.managed_image_rg }}",
+        "managed_image_name": "${{ parameters.managed_image_name }}",
+        "image_publisher": "${{ parameters.image_publisher }}",
+        "image_offer": "${{ parameters.image_offer }}",
+        "image_sku" : "${{ parameters.image_sku }}"
+      }
